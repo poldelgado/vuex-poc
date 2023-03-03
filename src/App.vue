@@ -1,28 +1,36 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <AppProductList />
+    <AppShoppingCart />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import AppProductList from "./components/AppProductList.vue";
+import AppShoppingCart from "./components/AppShoppingCart.vue";
 
 export default {
-  name: 'App',
+  name: "app",
   components: {
-    HelloWorld
+    AppProductList,
+    AppShoppingCart
   }
-}
+};
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#app > * {
+  flex-basis: 49%;
 }
 </style>
