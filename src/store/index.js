@@ -8,6 +8,7 @@ export default new Vuex.Store({
   state: {
     products: [],
     cart: [],
+    checkoutError: false,
   },
   mutations: {
     setProducts(state, products) {
@@ -31,6 +32,12 @@ export default new Vuex.Store({
     },
     removeProductFromCart(state, index) {
       state.cart.splice(index,1);
+    },
+    emptyCart(state) {
+      state.cart = [];
+    },
+    setCheckoutError(state, error) {
+      state.checkoutError = error;
     }
   },
   actions: {
@@ -65,6 +72,18 @@ export default new Vuex.Store({
 
       //Restaurar el inventario
       context.commit("incrementProductInventory", item);
+    },
+    checkout({commit, state}) {
+      api.buyProducts(state.cart, () => {
+        //Vaciar el carrito
+        commit("emptyCart");
+        //Establecer que no hay errores
+        commit("setCheckoutError", false);
+
+      }, () => {
+        //Establecer que hay errores
+        commit("setCheckoutError", true);
+      });
     }
   },
   getters: {
