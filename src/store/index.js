@@ -5,10 +5,12 @@ import api from "../api/shop.js";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
+  strict: true,
   state: {
     products: [],
     cart: [],
     checkoutError: false,
+    selectedProduct: {},
   },
   mutations: {
     setProducts(state, products) {
@@ -38,7 +40,20 @@ export default new Vuex.Store({
     },
     setCheckoutError(state, error) {
       state.checkoutError = error;
-    }
+    },
+    setSelectedProduct(state, product) {
+      state.selectedProduct = product;
+    },
+    editProduct(state, data) {
+      // Buscar el indice del producto
+      const index = state.products.findIndex(
+            product => product.id === state.selectedProduct.id
+          );
+      console.log(data,index);
+      // Componer el producto en base a las propiedades cambiadas
+
+      // Actualizarlo activando la reactividad
+    },
   },
   actions: {
     getProducts({commit}) {
@@ -104,7 +119,10 @@ export default new Vuex.Store({
     },
     cartTotal(state, getters) {
       return getters.productsOnCart.reduce((total, current) => total + current.price * current.quantity, 0);
-    }
+    },
+    selectedProduct(state) {
+      return state.selectedProduct;
+    },
   },
   modules: {}
 });
