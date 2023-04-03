@@ -3,7 +3,7 @@
         <hr />
         <input
             type="text"
-            v-model="selectedProduct.title"
+            v-model="title"
             placeholder="Selecciona producto"
         />
     </div>
@@ -18,7 +18,7 @@ export default {
         // }
         title: {
             get() {
-                return this.$store.getters.selectedProduct.title;
+                return this.$store.state.selectedProduct.title;
             },
             set(value) {
                 this.$store.commit("editProduct", {title:value});

@@ -51,8 +51,9 @@ export default new Vuex.Store({
           );
       console.log(data,index);
       // Componer el producto en base a las propiedades cambiadas
-
+      const product = Object.assign({}, state.products[index], data);      
       // Actualizarlo activando la reactividad
+      Vue.set(state.products, index, product);
     },
   },
   actions: {
@@ -122,6 +123,11 @@ export default new Vuex.Store({
     },
     selectedProduct(state) {
       return state.selectedProduct;
+    },
+    nearlySoldOut(state) {
+      return id => {
+        return state.products.find(product => product.id === id).inventory < 2;
+      }
     },
   },
   modules: {}

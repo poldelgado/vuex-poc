@@ -4,6 +4,7 @@
     <hr />
     <ul>
       <li
+      :class="{'sold-out': $store.getters.nearlySoldOut(product.id)}"
       @click="selectProduct(product)"
       v-for="product in products" :key="product.id">
         {{ product.title }} | {{ product.price }}
@@ -15,6 +16,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 export default {
   name: "AppProductList",
   async created() {
@@ -32,17 +34,26 @@ export default {
       this.$store.commit("setSelectedProduct", product);
     }
   },
-  computed: {
-    products() {
-      //return this.$store.state.products;
-      return this.$store.getters.productsOnStock;
-    }
-  }
+  // computed: {
+  //   products() {
+  //     //return this.$store.state.products;
+  //     return this.$store.getters.productsOnStock;
+  //   }
+  // }
+  computed: mapGetters({
+    products: 'productsOnStock'
+  })
 };
 </script>
 
 <style scoped>
 ul {
   text-align: left;
+}
+.sold-out {
+  background-color: lightpink;
+  border: 3px solid tomato;
+  padding: 0.3rem;
+  margin: 0.1rem;
 }
 </style>
