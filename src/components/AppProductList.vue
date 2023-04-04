@@ -4,9 +4,9 @@
     <hr />
     <ul>
       <li
-      :class="{'sold-out': $store.getters.nearlySoldOut(product.id)}"
+      :class="{'sold-out': nearlySoldOut(product.id)}"
       @click="selectProduct(product)"
-      v-for="product in products" :key="product.id">
+      v-for="product in productsOnStock" :key="product.id">
         {{ product.title }} | {{ product.price }}
         <i>{{ product.inventory }} </i>
         <button @click.prevent="addToCart(product)">add</button>
@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex';
 export default {
   name: "AppProductList",
   async created() {
@@ -27,22 +27,22 @@ export default {
     }
   },
   methods: {
-    addToCart(product) {
-      this.$store.dispatch("addProductToCart", product);
-    },
-    selectProduct(product) {
-      this.$store.commit("setSelectedProduct", product);
-    }
+    ...mapActions({
+      addToCart: 'addProductToCart',
+    }),
+    ...mapMutations({
+      selectProduct: 'setSelectedProduct',
+    }),
   },
-  // computed: {
-  //   products() {
-  //     //return this.$store.state.products;
-  //     return this.$store.getters.productsOnStock;
-  //   }
-  // }
-  computed: mapGetters({
-    products: 'productsOnStock'
-  })
+  computed:{
+    ...mapGetters([
+        'productsOnStock',
+        'nearlySoldOut'
+              ]),
+    ...mapState([
+      'selectedProduct',
+    ]),
+  }
 };
 </script>
 
