@@ -1,101 +1,34 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import api from "../api/shop.js";
+import shop from "../api/shop.js";
+import cart from "./cart.js";
+import products from "./products.js";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   strict: true,
-  state: {
-    products: [],
-    cart: [],
-    checkoutError: false,
-    selectedProduct: {},
+  modules: {
+    cart,
+    products,
   },
-  mutations: {
-    setProducts(state, products) {
-      state.products = products;
-    },
-    incrementProductQuantity(state, item) {
-      item.quantity++;
-    },
-    addProductToCart(state, product) {
-      state.cart.push({
-        id: product.id,
-        quantity: 1,
-      });
-    },
-    decrementProductInventory(state, product) {
-      product.inventory--;
-    },
-    incrementProductInventory(state, item) {
-      const product = state.products.find(product => product.id === item.id);
-      product.inventory += item.quantity;
-    },
-    removeProductFromCart(state, index) {
-      state.cart.splice(index,1);
-    },
-    emptyCart(state) {
-      state.cart = [];
-    },
+  state: {
+    checkoutError: false,
+  },
+  mutations: {   
     setCheckoutError(state, error) {
       state.checkoutError = error;
-    },
-    setSelectedProduct(state, product) {
-      state.selectedProduct = product;
-    },
-    editProduct(state, data) {
-      // Buscar el indice del producto
-      const index = state.products.findIndex(
-            product => product.id === state.selectedProduct.id
-          );
-      console.log(data,index);
-      // Componer el producto en base a las propiedades cambiadas
-      const product = Object.assign({}, state.products[index], data);      
-      // Actualizarlo activando la reactividad
-      Vue.set(state.products, index, product);
-    },
+    },   
   },
-  actions: {
-    getProducts({commit}) {
-      return new Promise((resolve) => {
-        api.getProducts(products => {
-          commit('setProducts', products);
-          resolve();
-        });
-      })
-    },
-    addProductToCart(context, product) {
-      //Verificar si hay inventario del producto
-      if (product.inventory === 0) return;
-      //Existe ya en el carrito?
-      const item = context.state.cart.find(item => item.id === product.id)
-      if (item) {
-        //Si es asi sumar uno mas a la compra
-        context.commit('incrementProductQuantity', item);
-      } else {
-        //Si no es asi, añadir el prod al carrito
-        context.commit('addProductToCart', product);
-      }
-      //Restar al inventario del producto
-      context.commit('decrementProductInventory', product);
-    },
-    removeProductFromCart(context, index) {
-      const item = context.state.cart[index];
-
-      //Eliminar producto del carrito
-      context.commit("removeProductFromCart", index);
-
-      //Restaurar el inventario
-      context.commit("incrementProductInventory", item);
-    },
+  actions: {  
     checkout({commit, state}) {
-      api.buyProducts(state.cart, () => {
+      shop.buyProducts(
+        state.cart.cart,
+        () => {
         //Vaciar el carrito
         commit("emptyCart");
         //Establecer que no hay errores
         commit("setCheckoutError", false);
-
       }, () => {
         //Establecer que hay errores
         commit("setCheckoutError", true);
@@ -103,32 +36,6 @@ export default new Vuex.Store({
     }
   },
   getters: {
-    productsOnStock(state) {
-      return state.products.filter(product => {
-        return product.inventory > 0;
-      });
-    },
-    productsOnCart(state) {
-      return state.cart.map(item => {
-        const product = state.products.find(product => product.id === item.id)
-        return {
-          title: product.title,
-          price: product.price,
-          quantity: item.quantity,
-        };
-      });
-    },
-    cartTotal(state, getters) {
-      return getters.productsOnCart.reduce((total, current) => total + current.price * current.quantity, 0);
-    },
-    selectedProduct(state) {
-      return state.selectedProduct;
-    },
-    nearlySoldOut(state) {
-      return id => {
-        return state.products.find(product => product.id === id).inventory < 2;
-      }
-    },
-  },
-  modules: {}
+   
+  }, 
 });
